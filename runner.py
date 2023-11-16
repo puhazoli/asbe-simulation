@@ -197,6 +197,7 @@ def main():
         # # NOTE: Unstable running, so if you encounter problems, try commenting this out
         # "bart": BARTEstimator(model=None),
         # NOTE: This needs openmpi to be installed, brew install openmpi on mac, apt-get install openmpi on linux
+        # NOTE: openbt is also slow and running this will significantly increase the runtime
         "openbt": OPENBTITEEstimator(model=OPENBT(model="bart"),two_model=True),
     }
     ests
@@ -204,7 +205,7 @@ def main():
     model_results = {}
     for key, value in ests.items():
         res = {}
-        for random_state in range(5):
+        for random_state in range(2):
             for d in range(1):
                 ds_main_simulation = prepare_data(d, random_state)
                 asl_main_simulation = BaseActiveLearner(
