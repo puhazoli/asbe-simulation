@@ -26,6 +26,7 @@ def main():
         BaseITEEstimator,
         BaseDataGenerator,
     )
+    from pyopenbt.openbt import OPENBT
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import train_test_split
     import numpy as np
@@ -185,19 +186,18 @@ def main():
         EMCMAcquisitionFunction,
         UncertaintyAcquisitionFunction,
     )
-    from openbt import openbt
     from xbart import XBART
 
     ests = {
-        "xbart_optimized": XBARTEstimator(
-            name="xbart_optimized",
-            model=XBART(num_sweeps=50, num_trees=400, beta=3, alpha=0.6),
-        ),
-        "gpy": GPyEstimator(),
-        # NOTE: Unstable running, so if you encounter problems, try commenting this out
-        "bart": BARTEstimator(model=None),
+        # "xbart_optimized": XBARTEstimator(
+        #     name="xbart_optimized",
+        #     model=XBART(num_sweeps=50, num_trees=400, beta=3, alpha=0.6),
+        # ),
+        # "gpy": GPyEstimator(),
+        # # NOTE: Unstable running, so if you encounter problems, try commenting this out
+        # "bart": BARTEstimator(model=None),
         # NOTE: This needs openmpi to be installed, brew install openmpi on mac, apt-get install openmpi on linux
-        # "openbt": OPENBTITEEstimator(model=openbt.OPENBT(model="bart"),two_model=True),
+        "openbt": OPENBTITEEstimator(model=OPENBT(model="bart"),two_model=True),
     }
     ests
     METRIC = "PEHE"
@@ -205,7 +205,7 @@ def main():
     for key, value in ests.items():
         res = {}
         for random_state in range(5):
-            for d in range(747):
+            for d in range(1):
                 ds_main_simulation = prepare_data(d, random_state)
                 asl_main_simulation = BaseActiveLearner(
                     estimator=value,

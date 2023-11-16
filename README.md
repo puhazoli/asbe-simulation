@@ -1,3 +1,7 @@
+# 0. Make sure the necessary dependencies are installed
+- Python 3.9^
+- openbtcli (from [here](https://bitbucket.org/mpratola/openbt/src/master/))
+
 # 1. Install the project
 
 `poetry install`

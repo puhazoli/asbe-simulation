@@ -10,12 +10,12 @@ python = "^3.11,<3.13"
 scipy = "1.11.3"
 econml = "^0.14.1"
 asbe = "^0.1.1"
-openbt = "^0.0.5"
 pymc-bart = "^0.5.2"
 xbart = "0.1.8"
 gpy = {git = "https://github.com/SheffieldML/GPy.git", rev = "devel"}
 fastcore = "^1.5.29"
 scikit-uplift = "^0.5.1"
+pyopenbt = {git = "https://github.com/cavan33/openbt_py.git"}
 
 
 [tool.poetry.group.dev.dependencies]
