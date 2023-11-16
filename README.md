@@ -21,7 +21,7 @@ The available arguments are:
 
 --num-variations: This argument is used to specify the number of random variations to run. It is an integer argument with a default value of 5.
 
---estimator: This argument is used to specify the estimators to use. It is a list argument with possible values of ["xbart"](https://github.com/JingyuHe/XBART), ["gpy"](https://gpy.readthedocs.io/en/deploy/), ["pybart"](https://www.pymc.io/projects/bart/en/latest/), and ["openbt"](https://github.com/cavan33/openbt_py). The default value is a list containing "xbart, "gpy", , and "pybart".
+--estimator: This argument is used to specify the estimators to use. It is a list argument with possible values of ["xbart"](https://github.com/JingyuHe/XBART), ["gpy"](https://gpy.readthedocs.io/en/deploy/), ["pybart"](https://www.pymc.io/projects/bart/en/latest/), and ["openbt"](https://github.com/cavan33/openbt_py). The default value is a list containing "xbart, "gpy", and "pybart".
 
 --acq-function: This argument is used to specify the acquisition functions to use. It is a list argument with possible values of "random", "emcm", "unc", and "er". The default value is a list containing "random", "emcm", and "unc".
 
