@@ -32,6 +32,21 @@ def main():
     import numpy as np
     import pandas as pd
     from copy import deepcopy
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Run random variations with different acquisition functions')
+    parser.add_argument('--num-variations', type=int, default=5, help='Number of random variations to run')
+    parser.add_argument('--estimator', nargs='+', choices=['xbart', 'gpy', 'pybart', 'openbt'], default=['xbart', 'gpy', 'pybart'], help='Estimators to use [possible values are: "xbart", "gpy", "pybart", "openbt"]')
+    parser.add_argument('--acq-function', nargs='+', choices=['random', 'emcm', 'unc', 'er'], default=['random', 'emcm', 'unc'], help='Acquisition functions to use [possible values are: "random", "emcm", "unc", "er"]')
+    parser.add_argument('--num-steps', type=int, default=6, help='Number of steps to run the active learning algorithm')
+
+
+    args = parser.parse_args()
+
+    num_variations = args.num_variations
+    estimators = args.estimator
+    acq_function = args.acq_function
+    num_steps = args.num_steps
 
     # Section 2.5 - Working example
     print("####### Section 2.5 #######")
@@ -188,38 +203,46 @@ def main():
     )
     from xbart import XBART
 
-    ests = {
-        # "xbart_optimized": XBARTEstimator(
-        #     name="xbart_optimized",
-        #     model=XBART(num_sweeps=50, num_trees=400, beta=3, alpha=0.6),
-        # ),
-        # "gpy": GPyEstimator(),
-        # # NOTE: Unstable running, so if you encounter problems, try commenting this out
-        # "bart": BARTEstimator(model=None),
+    # In order to avoid unnecessary initialization of the models, we initialize them here
+    ests = {}
+    if "xbart" in estimators:
+        ests["xbart"] = XBARTEstimator(
+            name="xbart_optimized",
+            model=XBART(num_sweeps=50, num_trees=400, beta=3, alpha=0.6),
+        )
+    if "gpy" in estimators:
+        ests["gpy"] = GPyEstimator()
+    if "pybart" in estimators:
+        # NOTE: Possible unstable running
+        ests["pybart"] = BARTEstimator(model=None)
+    if "openbt" in estimators:
         # NOTE: This needs openmpi to be installed, brew install openmpi on mac, apt-get install openmpi on linux
         # NOTE: openbt is also slow and running this will significantly increase the runtime
-        "openbt": OPENBTITEEstimator(model=OPENBT(model="bart"),two_model=True),
+        ests["openbt"] = OPENBTITEEstimator(model=OPENBT(model="bart"),two_model=True)
+        
+    acqs = {
+        "random": RandomAcquisitionFunction(name="random", method="top"),
+        "emcm": EMCMAcquisitionFunction(name="emcm", method="top"),
+        "unc": UncertaintyAcquisitionFunction(name="unc"),
+        "er": ExpectedReliability(name="er", method="top"),
     }
-    ests
+    # remove acquisition functions that are not in the list of acquisition functions
+    acqs_to_run = [v for k, v in acqs.items() if k in acq_function]
+
     METRIC = "PEHE"
     model_results = {}
     for key, value in ests.items():
         res = {}
-        for random_state in range(2):
-            for d in range(1):
+        for random_state in range(num_variations):
+            for d in range(747):
                 ds_main_simulation = prepare_data(d, random_state)
                 asl_main_simulation = BaseActiveLearner(
                     estimator=value,
-                    acquisition_function=[
-                        RandomAcquisitionFunction(name="random", method="top"),
-                        EMCMAcquisitionFunction(name="emcm", method="top"),
-                        UncertaintyAcquisitionFunction(name="unc"),
-                        # ExpectedReliability(name="er", method="top"), #Running this is extremely expensive
-                    ],
+                    acquisition_function=acqs_to_run,
                     assignment_function=BaseAssignmentFunction(),
                     stopping_function=None,
                     dataset=ds_main_simulation,
-                    al_steps=6,
+                    al_steps=num_steps,
                 )
                 _ = asl_main_simulation.simulate(
                     no_query=1, metric=["PEHE", "decision"]

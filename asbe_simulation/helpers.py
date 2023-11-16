@@ -467,14 +467,14 @@ class BARTEstimator(BaseITEEstimator):
         return out
 
 
-def _normalize(df, col):
-    if df.shape[0] == 1:
+def _normalize(df, col, max_number):
+    if df.shape[0] == 1 or type(df) == pd.Series:
         out = pd.json_normalize(df.loc[f"{col}_1"]).rename(
-            {i: f"{col}_step_{i}" for i in range(7)}, axis=1
+            {i: f"{col}_step_{i}" for i in range(1, max_number+1)}, axis=1
         )
     else:
         out = pd.json_normalize(df.loc[:, f"{col}_1"]).rename(
-            {i: f"{col}_step_{i}" for i in range(7)}, axis=1
+            {i: f"{col}_step_{i}" for i in range(max_number+1)}, axis=1
         )
     return out
 
@@ -482,21 +482,24 @@ def _normalize(df, col):
 def create_table(res, metric="PEHE"):
     concated = pd.concat([x for x in res.values()])
     concated = concated.loc[metric]
-    if concated.shape[0] == 1:
+    if concated.shape[0] == 1 or type(concated) == pd.Series:
         cols_to_check = concated.index
         sim_data_cols = [concated[["sim", "data"]].to_frame().T.reset_index(drop=True)]
     else:
         cols_to_check = concated.columns
         sim_data_cols = [concated[["sim", "data"]].reset_index(drop=True)]
+
     acq_function = [
         col.split("_")[0] for col in cols_to_check if col not in ["sim", "data"]
     ]
+    # Get the max number out of the columns
+    max_number = max(list(concated[f"{acq_function[0]}_1"].keys()))
     df_all = pd.concat(
-        [_normalize(concated, acq) for acq in acq_function] + sim_data_cols,
+        [_normalize(concated, acq, max_number) for acq in acq_function] + sim_data_cols,
         axis=1,
     )
     for col in acq_function:
-        df_all[f"{col}_change"] = df_all[f"{col}_step_1"] - df_all[f"{col}_step_6"]
+        df_all[f"{col}_change"] = df_all[f"{col}_step_1"] - df_all[f"{col}_step_{max_number}"]
     return df_all
 
 
