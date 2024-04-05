@@ -13,6 +13,7 @@ import pymc_bart as pmb
 import pymc as pm
 import GPy
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 
 def generate_data(N, seed=1005):
@@ -493,7 +494,10 @@ def create_table(res, metric="PEHE"):
         col.split("_")[0] for col in cols_to_check if col not in ["sim", "data"]
     ]
     # Get the max number out of the columns
-    max_number = max(list(concated[f"{acq_function[0]}_1"].keys()))
+    try:
+        max_number = max(list(concated[f"{acq_function[0]}_1"])[0].keys())
+    except AttributeError:
+        max_number = max(list(concated[f"{acq_function[0]}_1"].keys()))
     df_all = pd.concat(
         [_normalize(concated, acq, max_number) for acq in acq_function] + sim_data_cols,
         axis=1,
@@ -653,5 +657,6 @@ def plot_metric_estimators(df, metric):
     )
     ax.legend()
     plt.grid(True)
-    plt.savefig(f"./figures/{metric}_estimators.pdf")
+    # add current datetime to figure name
+    plt.savefig(f"./figures/{metric}_estimators_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.pdf")
     plt.show()

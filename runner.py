@@ -235,6 +235,8 @@ def main():
         res = {}
         for random_state in range(num_variations):
             for d in range(747):
+                if d % 100 == 0:
+                    print(f"Running {key} with random state {random_state} and data {d}")
                 ds_main_simulation = prepare_data(d, random_state)
                 asl_main_simulation = BaseActiveLearner(
                     estimator=value,
