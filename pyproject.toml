@@ -8,11 +8,12 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11,<3.13"
 scipy = "1.11.3"
-econml = "^0.14.1"
+econml = "^0.15.0"
 asbe = "^0.1.1"
 numpy = "^1.7.0"
 pymc-bart = "^0.5.2"
 xbart = "0.1.8"
+scikit-learn = "^1.5.0"
 gpy = {git = "https://github.com/SheffieldML/GPy.git", rev = "devel"}
 fastcore = "^1.5.29"
 scikit-uplift = "^0.5.1"
